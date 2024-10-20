@@ -10,6 +10,15 @@ spring:
     allow-bean-definition-overriding: true
   application:
     name: mian-edge-api
+  datasource:
+    url: jdbc:mysql://localhost:3306/miam_edge_api?useSSL=false&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8
+    driverClassName: 'com.mysql.cj.jdbc.Driver'
+    username: root
+    password: 1234
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
   ibm:
     mq:
       host: localhost
