@@ -11,12 +11,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AverageTemperatureResponseDto {
+public class AverageHeartRateResponseDto {
 
-    private double averageTemperature;
+    private double averageHeartRate;
 
     private LocalDateTime date;
 
     private String status;
+
 
 }
