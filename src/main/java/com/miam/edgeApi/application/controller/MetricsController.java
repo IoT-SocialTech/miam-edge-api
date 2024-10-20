@@ -1,5 +1,6 @@
 package com.miam.edgeApi.application.controller;
 
+import com.miam.edgeApi.application.dto.response.HeartRateResponseDto;
 import com.miam.edgeApi.application.dto.response.TemperatureResponseDto;
 import com.miam.edgeApi.application.services.MetricsService;
 import com.miam.edgeApi.shared.model.dto.response.ApiResponse;
@@ -29,4 +30,10 @@ public class MetricsController {
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get heart rate")
+    @GetMapping("/metrics/heartRate")
+    public ResponseEntity<ApiResponse<HeartRateResponseDto>> getHeartRate() {
+        var res = metricsService.getHeartRate();
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
 }
