@@ -1,5 +1,6 @@
 package com.miam.edgeApi.application.services.impl;
 
+import com.miam.edgeApi.application.dto.response.HeartRateResponseDto;
 import com.miam.edgeApi.application.dto.response.TemperatureResponseDto;
 import com.miam.edgeApi.application.services.MetricsService;
 import com.miam.edgeApi.enums.MetricsStatus;
@@ -16,6 +17,40 @@ public class MetricsServiceImpl implements MetricsService {
 
     @Autowired
     private MetricsRepository metricsRepository;
+
+    @Override
+    public ApiResponse<HeartRateResponseDto> getHeartRate(){
+
+        String metrics = "{\"heartRate\":\"120\", \"temperature\": \"36\", \"alertsGenerated\": \"0\", \"distanceDetector\":\"false\", \"patientId\": \"1\", \"deviceId\":\"1\"}";
+        ParserJsonMeasures parserJsonMeasures = new ParserJsonMeasures(metrics);
+
+        int heartRate;
+        HeartRateResponseDto heartRateResponseDto = null;
+
+        try {
+            heartRateResponseDto = new HeartRateResponseDto();
+            heartRate = Integer.parseInt(parserJsonMeasures.getHeartRate());
+
+            heartRateResponseDto.setHeartRate(heartRate);
+            heartRateResponseDto.setDate(LocalDateTime.now());
+            heartRateResponseDto.setStatus(MetricsStatus.NORMAL.getStatus());
+
+            if (heartRate < 60 && heartRate >= 40|| heartRate > 100 && heartRate <= 120){
+                heartRateResponseDto.setStatus(MetricsStatus.WARNING.getStatus());
+            } else if (heartRate < 40 || heartRate > 120){
+                heartRateResponseDto.setStatus(MetricsStatus.DANGER.getStatus());
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        if (heartRateResponseDto != null) {
+            return new ApiResponse<> ("Heart Rate fetched successfully", Estatus.SUCCESS, heartRateResponseDto);
+        } else {
+            return new ApiResponse<> ("Error fetching Heart Rate", Estatus.ERROR, null);
+        }
+    }
 
     @Override
     public ApiResponse<TemperatureResponseDto> getTemperature(){
