@@ -1,7 +1,6 @@
 package com.miam.edgeApi.application.controller;
 
 import com.miam.edgeApi.application.dto.response.AverageHeartRateResponseDto;
-import com.miam.edgeApi.application.dto.response.AverageTemperatureResponseDto;
 import com.miam.edgeApi.application.dto.response.HeartRateResponseDto;
 import com.miam.edgeApi.application.dto.response.TemperatureResponseDto;
 import com.miam.edgeApi.application.services.MetricsService;
@@ -29,13 +28,6 @@ public class MetricsController {
     @GetMapping("/metrics/averageHeartRate")
     public ResponseEntity<ApiResponse<AverageHeartRateResponseDto>> getAverageHeartRate() {
         var res = metricsService.getAverageHeartRate();
-        return new ResponseEntity<>(res, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Get average temperature")
-    @GetMapping("/metrics/averageTemperature")
-    public ResponseEntity<ApiResponse<AverageTemperatureResponseDto>> getAverageTemperature() {
-        var res = metricsService.getAverageTemperature();
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
