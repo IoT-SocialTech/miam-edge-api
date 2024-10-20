@@ -5,12 +5,15 @@ import com.miam.edgeApi.application.dto.response.AverageTemperatureResponseDto;
 import com.miam.edgeApi.application.dto.response.HeartRateResponseDto;
 import com.miam.edgeApi.application.dto.response.TemperatureResponseDto;
 import com.miam.edgeApi.application.services.MetricsService;
+import com.miam.edgeApi.domain.entities.Metrics;
 import com.miam.edgeApi.enums.MetricsStatus;
 import com.miam.edgeApi.infraestructure.repositories.MetricsRepository;
 import com.miam.edgeApi.shared.model.dto.response.ApiResponse;
 import com.miam.edgeApi.shared.model.enums.Estatus;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -19,6 +22,53 @@ public class MetricsServiceImpl implements MetricsService {
 
     @Autowired
     private MetricsRepository metricsRepository;
+
+    @Override
+    @Transactional
+    public void createMetrics(JSONObject jsonMetrics) {
+        Metrics metrics = new Metrics();
+
+        int temperature;
+        int heartRate;
+        int alertsGenerated;
+        int patientId;
+        int deviceId;
+        boolean distanceDetector;
+
+        try {
+
+            temperature = (int) Float.parseFloat(jsonMetrics.getString("temperature"));
+            heartRate = Integer.parseInt(jsonMetrics.getString("heartRate"));
+            alertsGenerated = Integer.parseInt(jsonMetrics.getString("alertsGenerated"));
+            patientId = Integer.parseInt(jsonMetrics.getString("patientId"));
+            deviceId = Integer.parseInt(jsonMetrics.getString("deviceId"));
+            distanceDetector = Boolean.parseBoolean(jsonMetrics.getString("distanceDetector"));
+
+            metrics.setHeartRate(heartRate);
+            metrics.setTemperature(temperature);
+            metrics.setAlertsGenerated(alertsGenerated);
+            metrics.setDistanceDetector(distanceDetector);
+            metrics.setDate(LocalDateTime.now());
+            metrics.setPatientId(patientId);
+            metrics.setDeviceId(deviceId);
+            metrics.setStatus(MetricsStatus.NORMAL.getStatus());
+
+            if (temperature > 37 && temperature <= 39 || temperature >= 34 && temperature < 36 ) {
+                metrics.setStatus(MetricsStatus.WARNING.getStatus() + " - Temperature");
+            } else if (temperature > 39 || temperature < 34){
+                metrics.setStatus(MetricsStatus.DANGER.getStatus() + " - Temperature");
+            } else if (heartRate < 60 && heartRate >= 40|| heartRate > 100 && heartRate <= 120){
+                metrics.setStatus(MetricsStatus.WARNING.getStatus() + " - Heart Rate");
+            } else if (heartRate < 40 || heartRate > 120){
+                metrics.setStatus(MetricsStatus.DANGER.getStatus() + " - Heart Rate");
+            }
+
+            metricsRepository.save(metrics);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+    }
 
     @Override
     public ApiResponse<HeartRateResponseDto> getHeartRate(){

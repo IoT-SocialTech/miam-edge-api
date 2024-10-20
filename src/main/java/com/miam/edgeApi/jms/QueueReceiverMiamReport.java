@@ -1,5 +1,8 @@
 package com.miam.edgeApi.jms;
 
+import com.miam.edgeApi.application.services.MetricsService;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.annotation.JmsListener;
 import org.springframework.stereotype.Component;
@@ -10,10 +13,23 @@ public class QueueReceiverMiamReport {
     @Value("${application.messaging.input-report-queue}")
     private String queueName;
 
+    @Autowired
+    private MetricsService metricsService;
+
     @JmsListener(destination = "${application.messaging.input-report-queue}", containerFactory = "queueListenerContainerFactoryWithDelay")
     public void functionMiamReceiver(String message) {
 
         System.out.println("Received message from queue [ " + queueName + " ] -> Message [ " + message + " ].");
+        JSONObject json = new JSONObject(message);
+
+        metricsService.createMetrics(json);
+
+        try {
+            Thread.sleep(5000);
+        } catch (Exception e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+        }
     }
 
 }
