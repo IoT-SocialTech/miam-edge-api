@@ -1,5 +1,6 @@
 package com.miam.edgeApi.application.services.impl;
 
+import com.miam.edgeApi.application.dto.response.AverageHeartRateResponseDto;
 import com.miam.edgeApi.application.dto.response.HeartRateResponseDto;
 import com.miam.edgeApi.application.dto.response.TemperatureResponseDto;
 import com.miam.edgeApi.application.services.MetricsService;
@@ -84,6 +85,28 @@ public class MetricsServiceImpl implements MetricsService {
         } else {
             return new ApiResponse<> ("Error fetching Temperature", Estatus.ERROR, null);
         }
+    }
+
+    @Override
+    public ApiResponse<AverageHeartRateResponseDto> getAverageHeartRate(){
+
+        double averageHeartRate = metricsRepository.findAverageHeartRate();
+        AverageHeartRateResponseDto averageHeartRateResponseDto = new AverageHeartRateResponseDto();
+
+        averageHeartRateResponseDto.setAverageHeartRate(averageHeartRate);
+        averageHeartRateResponseDto.setDate(LocalDateTime.now());
+        averageHeartRateResponseDto.setStatus(MetricsStatus.NORMAL.getStatus());
+
+        if (averageHeartRate < 60 && averageHeartRate >= 40|| averageHeartRate > 100 && averageHeartRate <= 120){
+            averageHeartRateResponseDto.setStatus(MetricsStatus.WARNING.getStatus());
+        } else if (averageHeartRate < 40 || averageHeartRate > 120){
+            averageHeartRateResponseDto.setStatus(MetricsStatus.DANGER.getStatus());
+        }
+
+        System.out.println("Average Heart Rate: " + metricsRepository.findAverageHeartRate());
+
+        return new ApiResponse<> ("Average Heart Rate fetched successfully", Estatus.SUCCESS, averageHeartRateResponseDto);
+
     }
 
 }
