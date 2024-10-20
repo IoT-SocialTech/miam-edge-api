@@ -1,0 +1,21 @@
+application:
+  messaging:
+    input-queue: RECEPCION.SOLICITUDES.MIAM
+    input-report-queue: RECEPCION.REPORTES.MIAM
+spring:
+  batch:
+    job:
+      enabled: false
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: mian-edge-api
+  ibm:
+    mq:
+      host: localhost
+      port: 1000
+      queue-manager: QMORDENES
+      channel: DEV.APP.SVRCONN
+      username: app
+      password: app
+      receive-timeout: 2000
