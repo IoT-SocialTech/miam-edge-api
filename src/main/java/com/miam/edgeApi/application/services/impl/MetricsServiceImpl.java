@@ -1,6 +1,7 @@
 package com.miam.edgeApi.application.services.impl;
 
 import com.miam.edgeApi.application.dto.response.AverageHeartRateResponseDto;
+import com.miam.edgeApi.application.dto.response.AverageTemperatureResponseDto;
 import com.miam.edgeApi.application.dto.response.HeartRateResponseDto;
 import com.miam.edgeApi.application.dto.response.TemperatureResponseDto;
 import com.miam.edgeApi.application.services.MetricsService;
@@ -109,4 +110,24 @@ public class MetricsServiceImpl implements MetricsService {
 
     }
 
+    @Override
+    public ApiResponse<AverageTemperatureResponseDto> getAverageTemperature(){
+
+        double averageTemperature = metricsRepository.findAverageTemperature();
+        AverageTemperatureResponseDto averageTemperatureResponseDto = new AverageTemperatureResponseDto();
+
+        averageTemperatureResponseDto.setAverageTemperature(averageTemperature);
+        averageTemperatureResponseDto.setDate(LocalDateTime.now());
+        averageTemperatureResponseDto.setStatus(MetricsStatus.NORMAL.getStatus());
+
+        if (averageTemperature > 37 && averageTemperature <= 39 || averageTemperature >= 34 && averageTemperature < 36 ) {
+            averageTemperatureResponseDto.setStatus(MetricsStatus.WARNING.getStatus());
+        } else if (averageTemperature > 39 || averageTemperature < 34){
+            averageTemperatureResponseDto.setStatus(MetricsStatus.DANGER.getStatus());
+        }
+
+        System.out.println("Average Temperature: " + metricsRepository.findAverageTemperature());
+
+        return new ApiResponse<> ("Average Temperature fetched successfully", Estatus.SUCCESS, averageTemperatureResponseDto);
+    }
 }
