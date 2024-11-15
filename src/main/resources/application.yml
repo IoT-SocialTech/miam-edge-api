@@ -11,20 +11,24 @@ spring:
   application:
     name: mian-edge-api
   datasource:
-    url: jdbc:mysql://localhost:3306/miam_edge_api?useSSL=false&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8
-    driverClassName: 'com.mysql.cj.jdbc.Driver'
-    username: root
-    password: 1234
+    url: ${DB_URL}
+    driverClassName: 'org.postgresql.Driver'
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
   ibm:
     mq:
-      host: localhost
-      port: 1000
-      queue-manager: QMORDENES
-      channel: DEV.APP.SVRCONN
-      username: app
-      password: app
+      host: ${MQ_HOST}
+      port: ${MQ_PORT}
+      queue-manager: ${MQ_QUEUE_MANAGER}
+      channel: ${MQ_CHANNEL}
+      username: ${MQ_USER}
+      password: ${MQ_PASSWORD}
       receive-timeout: 2000
+  config:
+    import: env.properties
+server:
+  port: 8081

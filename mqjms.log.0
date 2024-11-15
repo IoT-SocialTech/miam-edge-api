@@ -1,0 +1,169 @@
+30 de octubre de 2024, 22:38:33 PET[org.springframework.jms.JmsListenerEndpointContainer#0-1] com.ibm.msg.client.jms.internal.JmsProviderExceptionListener
+Se ha enviado una excepción al escucha de excepciones de la conexión: '
+                       Mensaje : com.ibm.msg.client.jms.DetailedJMSException: JMSWMQ1107: Ha surgido un problema con esta conexión.
+Se ha producido un error con la conexión JMS de IBM MQ.
+Utilice la excepción enlazada para determinar la causa de este error.
+                         Clase : class com.ibm.msg.client.jms.DetailedJMSException
+                          Pila : com.ibm.msg.client.wmq.common.internal.Reason.reasonToException(Reason.java:595)
+                               : com.ibm.msg.client.wmq.common.internal.Reason.createException(Reason.java:215)
+                               : com.ibm.msg.client.wmq.internal.WMQMessageConsumer.checkJmqiCallSuccess(WMQMessageConsumer.java:217)
+                               : com.ibm.msg.client.wmq.internal.WMQMessageConsumer.checkJmqiCallSuccess(WMQMessageConsumer.java:156)
+                               : com.ibm.msg.client.wmq.internal.WMQConsumerShadow.getMsg(WMQConsumerShadow.java:1859)
+                               : com.ibm.msg.client.wmq.internal.WMQSyncConsumerShadow.receiveInternal(WMQSyncConsumerShadow.java:233)
+                               : com.ibm.msg.client.wmq.internal.WMQConsumerShadow.receive(WMQConsumerShadow.java:1462)
+                               : com.ibm.msg.client.wmq.internal.WMQMessageConsumer.receive(WMQMessageConsumer.java:674)
+                               : com.ibm.msg.client.jms.internal.JmsMessageConsumerImpl.receiveInboundMessage(JmsMessageConsumerImpl.java:1083)
+                               : com.ibm.msg.client.jms.internal.JmsMessageConsumerImpl.receive(JmsMessageConsumerImpl.java:685)
+                               : com.ibm.mq.jms.MQMessageConsumer.receive(MQMessageConsumer.java:249)
+                               : org.springframework.jms.connection.CachedMessageConsumer.receive(CachedMessageConsumer.java:86)
+                               : org.springframework.jms.support.destination.JmsDestinationAccessor.receiveFromConsumer(JmsDestinationAccessor.java:132)
+                               : org.springframework.jms.listener.AbstractPollingMessageListenerContainer.receiveMessage(AbstractPollingMessageListenerContainer.java:431)
+                               : org.springframework.jms.listener.AbstractPollingMessageListenerContainer.doReceiveAndExecute(AbstractPollingMessageListenerContainer.java:316)
+                               : org.springframework.jms.listener.AbstractPollingMessageListenerContainer.receiveAndExecute(AbstractPollingMessageListenerContainer.java:246)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.invokeListener(DefaultMessageListenerContainer.java:1237)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.executeOngoingLoop(DefaultMessageListenerContainer.java:1227)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.run(DefaultMessageListenerContainer.java:1120)
+                               : java.lang.Thread.run(Thread.java:1570)
+     Se debe a [1] --> Mensaje : com.ibm.mq.MQException: JMSCMQ0001: La llamada de IBM MQ ha fallado con código de terminación '2' ('MQCC_FAILED') razón '2009' ('MQRC_CONNECTION_BROKEN').
+                         Clase : class com.ibm.mq.MQException
+                          Pila : com.ibm.msg.client.wmq.common.internal.Reason.createException(Reason.java:203)
+                               : com.ibm.msg.client.wmq.internal.WMQMessageConsumer.checkJmqiCallSuccess(WMQMessageConsumer.java:217)
+                               : com.ibm.msg.client.wmq.internal.WMQMessageConsumer.checkJmqiCallSuccess(WMQMessageConsumer.java:156)
+                               : com.ibm.msg.client.wmq.internal.WMQConsumerShadow.getMsg(WMQConsumerShadow.java:1859)
+                               : com.ibm.msg.client.wmq.internal.WMQSyncConsumerShadow.receiveInternal(WMQSyncConsumerShadow.java:233)
+                               : com.ibm.msg.client.wmq.internal.WMQConsumerShadow.receive(WMQConsumerShadow.java:1462)
+                               : com.ibm.msg.client.wmq.internal.WMQMessageConsumer.receive(WMQMessageConsumer.java:674)
+                               : com.ibm.msg.client.jms.internal.JmsMessageConsumerImpl.receiveInboundMessage(JmsMessageConsumerImpl.java:1083)
+                               : com.ibm.msg.client.jms.internal.JmsMessageConsumerImpl.receive(JmsMessageConsumerImpl.java:685)
+                               : com.ibm.mq.jms.MQMessageConsumer.receive(MQMessageConsumer.java:249)
+                               : org.springframework.jms.connection.CachedMessageConsumer.receive(CachedMessageConsumer.java:86)
+                               : org.springframework.jms.support.destination.JmsDestinationAccessor.receiveFromConsumer(JmsDestinationAccessor.java:132)
+                               : org.springframework.jms.listener.AbstractPollingMessageListenerContainer.receiveMessage(AbstractPollingMessageListenerContainer.java:431)
+                               : org.springframework.jms.listener.AbstractPollingMessageListenerContainer.doReceiveAndExecute(AbstractPollingMessageListenerContainer.java:316)
+                               : org.springframework.jms.listener.AbstractPollingMessageListenerContainer.receiveAndExecute(AbstractPollingMessageListenerContainer.java:246)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.invokeListener(DefaultMessageListenerContainer.java:1237)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.executeOngoingLoop(DefaultMessageListenerContainer.java:1227)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.run(DefaultMessageListenerContainer.java:1120)
+                               : java.lang.Thread.run(Thread.java:1570)
+'.
+
+EXPLICACIÓN:
+null
+
+ACCIÓN:
+Revise los detalles de la excepción para obtener más información.
+--------------------------------------------------------------------
+30 de octubre de 2024, 22:38:33 PET[org.springframework.jms.JmsListenerEndpointContainer#0-2] com.ibm.msg.client.jms.internal.JmsProviderExceptionListener
+Se hace caso omiso de la excepción ya que no hay ningún escucha de excepciones registrado: '
+                       Mensaje : com.ibm.msg.client.jms.DetailedJMSException: JMSWMQ1107: Ha surgido un problema con esta conexión.
+Se ha producido un error con la conexión JMS de IBM MQ.
+Utilice la excepción enlazada para determinar la causa de este error.
+                         Clase : class com.ibm.msg.client.jms.DetailedJMSException
+                          Pila : com.ibm.msg.client.wmq.common.internal.Reason.reasonToException(Reason.java:595)
+                               : com.ibm.msg.client.wmq.common.internal.Reason.createException(Reason.java:215)
+                               : com.ibm.msg.client.wmq.internal.WMQSession.connect(WMQSession.java:458)
+                               : com.ibm.msg.client.wmq.internal.WMQSession.<init>(WMQSession.java:358)
+                               : com.ibm.msg.client.wmq.internal.WMQConnection.createSession(WMQConnection.java:1065)
+                               : com.ibm.msg.client.jms.internal.JmsConnectionImpl.createSession(JmsConnectionImpl.java:814)
+                               : com.ibm.mq.jms.MQConnection.createSession(MQConnection.java:340)
+                               : jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+                               : java.lang.reflect.Method.invoke(Method.java:580)
+                               : org.springframework.jms.connection.SingleConnectionFactory$SharedConnectionInvocationHandler.invoke(SingleConnectionFactory.java:678)
+                               : jdk.proxy2.$Proxy144.createSession(null:-1)
+                               : org.springframework.jms.connection.JmsTransactionManager.createSession(JmsTransactionManager.java:341)
+                               : org.springframework.jms.connection.JmsTransactionManager.doBegin(JmsTransactionManager.java:224)
+                               : org.springframework.transaction.support.AbstractPlatformTransactionManager.startTransaction(AbstractPlatformTransactionManager.java:532)
+                               : org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:405)
+                               : org.springframework.jms.listener.AbstractPollingMessageListenerContainer.receiveAndExecute(AbstractPollingMessageListenerContainer.java:243)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.invokeListener(DefaultMessageListenerContainer.java:1237)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.executeOngoingLoop(DefaultMessageListenerContainer.java:1227)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.run(DefaultMessageListenerContainer.java:1120)
+                               : java.lang.Thread.run(Thread.java:1570)
+     Se debe a [1] --> Mensaje : com.ibm.mq.MQException: JMSCMQ0001: La llamada de IBM MQ ha fallado con código de terminación '2' ('MQCC_FAILED') razón '2009' ('MQRC_CONNECTION_BROKEN').
+                         Clase : class com.ibm.mq.MQException
+                          Pila : com.ibm.msg.client.wmq.common.internal.Reason.createException(Reason.java:203)
+                               : com.ibm.msg.client.wmq.internal.WMQSession.connect(WMQSession.java:458)
+                               : com.ibm.msg.client.wmq.internal.WMQSession.<init>(WMQSession.java:358)
+                               : com.ibm.msg.client.wmq.internal.WMQConnection.createSession(WMQConnection.java:1065)
+                               : com.ibm.msg.client.jms.internal.JmsConnectionImpl.createSession(JmsConnectionImpl.java:814)
+                               : com.ibm.mq.jms.MQConnection.createSession(MQConnection.java:340)
+                               : jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+                               : java.lang.reflect.Method.invoke(Method.java:580)
+                               : org.springframework.jms.connection.SingleConnectionFactory$SharedConnectionInvocationHandler.invoke(SingleConnectionFactory.java:678)
+                               : jdk.proxy2.$Proxy144.createSession(null:-1)
+                               : org.springframework.jms.connection.JmsTransactionManager.createSession(JmsTransactionManager.java:341)
+                               : org.springframework.jms.connection.JmsTransactionManager.doBegin(JmsTransactionManager.java:224)
+                               : org.springframework.transaction.support.AbstractPlatformTransactionManager.startTransaction(AbstractPlatformTransactionManager.java:532)
+                               : org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:405)
+                               : org.springframework.jms.listener.AbstractPollingMessageListenerContainer.receiveAndExecute(AbstractPollingMessageListenerContainer.java:243)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.invokeListener(DefaultMessageListenerContainer.java:1237)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.executeOngoingLoop(DefaultMessageListenerContainer.java:1227)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.run(DefaultMessageListenerContainer.java:1120)
+                               : java.lang.Thread.run(Thread.java:1570)
+     Se debe a [2] --> Mensaje : com.ibm.mq.jmqi.JmqiException: CC=2;RC=2009;AMQ9204: Se ha rechazado la conexión con el host 'localhost(1000)'. [1=com.ibm.mq.jmqi.JmqiException[CC=2;RC=2009;AMQ9208: Error en la recepción del host 'localhost/127.0.0.1:1000 (localhost)'. [1=-1,2=ffffffff,3=localhost/127.0.0.1:1000 (localhost),4=TCP]],3=localhost(1000),4=,5=RemoteConnection.receiveTSH]
+                         Clase : class com.ibm.mq.jmqi.JmqiException
+                          Pila : com.ibm.mq.jmqi.remote.api.RemoteFAP$Connector.jmqiConnect(RemoteFAP.java:13683)
+                               : com.ibm.mq.jmqi.remote.api.RemoteFAP$Connector.access$100(RemoteFAP.java:13201)
+                               : com.ibm.mq.jmqi.remote.api.RemoteFAP.jmqiConnect(RemoteFAP.java:1451)
+                               : com.ibm.mq.jmqi.remote.api.RemoteFAP.jmqiConnect(RemoteFAP.java:1392)
+                               : com.ibm.mq.ese.jmqi.InterceptedJmqiImpl.jmqiConnect(InterceptedJmqiImpl.java:377)
+                               : com.ibm.mq.ese.jmqi.ESEJMQI.jmqiConnect(ESEJMQI.java:562)
+                               : com.ibm.msg.client.wmq.internal.WMQSession.connect(WMQSession.java:415)
+                               : com.ibm.msg.client.wmq.internal.WMQSession.<init>(WMQSession.java:358)
+                               : com.ibm.msg.client.wmq.internal.WMQConnection.createSession(WMQConnection.java:1065)
+                               : com.ibm.msg.client.jms.internal.JmsConnectionImpl.createSession(JmsConnectionImpl.java:814)
+                               : com.ibm.mq.jms.MQConnection.createSession(MQConnection.java:340)
+                               : jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+                               : java.lang.reflect.Method.invoke(Method.java:580)
+                               : org.springframework.jms.connection.SingleConnectionFactory$SharedConnectionInvocationHandler.invoke(SingleConnectionFactory.java:678)
+                               : jdk.proxy2.$Proxy144.createSession(null:-1)
+                               : org.springframework.jms.connection.JmsTransactionManager.createSession(JmsTransactionManager.java:341)
+                               : org.springframework.jms.connection.JmsTransactionManager.doBegin(JmsTransactionManager.java:224)
+                               : org.springframework.transaction.support.AbstractPlatformTransactionManager.startTransaction(AbstractPlatformTransactionManager.java:532)
+                               : org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:405)
+                               : org.springframework.jms.listener.AbstractPollingMessageListenerContainer.receiveAndExecute(AbstractPollingMessageListenerContainer.java:243)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.invokeListener(DefaultMessageListenerContainer.java:1237)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.executeOngoingLoop(DefaultMessageListenerContainer.java:1227)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.run(DefaultMessageListenerContainer.java:1120)
+                               : java.lang.Thread.run(Thread.java:1570)
+     Se debe a [3] --> Mensaje : com.ibm.mq.jmqi.JmqiException: CC=2;RC=2009;AMQ9208: Error en la recepción del host 'localhost/127.0.0.1:1000 (localhost)'. [1=-1,2=ffffffff,3=localhost/127.0.0.1:1000 (localhost),4=TCP]
+                         Clase : class com.ibm.mq.jmqi.JmqiException
+                          Pila : com.ibm.mq.jmqi.remote.impl.RemoteConnection.receiveTSH(RemoteConnection.java:3493)
+                               : com.ibm.mq.jmqi.remote.impl.RemoteConnection.initSess(RemoteConnection.java:1445)
+                               : com.ibm.mq.jmqi.remote.impl.RemoteConnection.connect(RemoteConnection.java:1022)
+                               : com.ibm.mq.jmqi.remote.impl.RemoteConnectionSpecification.getNewConnection(RemoteConnectionSpecification.java:691)
+                               : com.ibm.mq.jmqi.remote.impl.RemoteConnectionSpecification.getSessionFromNewConnection(RemoteConnectionSpecification.java:283)
+                               : com.ibm.mq.jmqi.remote.impl.RemoteConnectionSpecification.getSession(RemoteConnectionSpecification.java:170)
+                               : com.ibm.mq.jmqi.remote.impl.RemoteConnectionPool.getSession(RemoteConnectionPool.java:128)
+                               : com.ibm.mq.jmqi.remote.api.RemoteFAP$Connector.jmqiConnect(RemoteFAP.java:13407)
+                               : com.ibm.mq.jmqi.remote.api.RemoteFAP$Connector.access$100(RemoteFAP.java:13201)
+                               : com.ibm.mq.jmqi.remote.api.RemoteFAP.jmqiConnect(RemoteFAP.java:1451)
+                               : com.ibm.mq.jmqi.remote.api.RemoteFAP.jmqiConnect(RemoteFAP.java:1392)
+                               : com.ibm.mq.ese.jmqi.InterceptedJmqiImpl.jmqiConnect(InterceptedJmqiImpl.java:377)
+                               : com.ibm.mq.ese.jmqi.ESEJMQI.jmqiConnect(ESEJMQI.java:562)
+                               : com.ibm.msg.client.wmq.internal.WMQSession.connect(WMQSession.java:415)
+                               : com.ibm.msg.client.wmq.internal.WMQSession.<init>(WMQSession.java:358)
+                               : com.ibm.msg.client.wmq.internal.WMQConnection.createSession(WMQConnection.java:1065)
+                               : com.ibm.msg.client.jms.internal.JmsConnectionImpl.createSession(JmsConnectionImpl.java:814)
+                               : com.ibm.mq.jms.MQConnection.createSession(MQConnection.java:340)
+                               : jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+                               : java.lang.reflect.Method.invoke(Method.java:580)
+                               : org.springframework.jms.connection.SingleConnectionFactory$SharedConnectionInvocationHandler.invoke(SingleConnectionFactory.java:678)
+                               : jdk.proxy2.$Proxy144.createSession(null:-1)
+                               : org.springframework.jms.connection.JmsTransactionManager.createSession(JmsTransactionManager.java:341)
+                               : org.springframework.jms.connection.JmsTransactionManager.doBegin(JmsTransactionManager.java:224)
+                               : org.springframework.transaction.support.AbstractPlatformTransactionManager.startTransaction(AbstractPlatformTransactionManager.java:532)
+                               : org.springframework.transaction.support.AbstractPlatformTransactionManager.getTransaction(AbstractPlatformTransactionManager.java:405)
+                               : org.springframework.jms.listener.AbstractPollingMessageListenerContainer.receiveAndExecute(AbstractPollingMessageListenerContainer.java:243)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.invokeListener(DefaultMessageListenerContainer.java:1237)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.executeOngoingLoop(DefaultMessageListenerContainer.java:1227)
+                               : org.springframework.jms.listener.DefaultMessageListenerContainer$AsyncMessageListenerInvoker.run(DefaultMessageListenerContainer.java:1120)
+                               : java.lang.Thread.run(Thread.java:1570)
+'.
+
+EXPLICACIÓN:
+Se ha intentado enviar una excepción al escucha de excepciones de la conexión pero no se había registrado un escucha.
+
+ACCIÓN:
+Debe registrarse un escucha de excepciones con la conexión para recibir sus excepciones.
+--------------------------------------------------------------------
