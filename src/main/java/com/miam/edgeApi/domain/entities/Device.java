@@ -32,6 +32,9 @@ public class Device {
     @Column(name = "limit_distance", nullable = false)
     private int limitDistance;
 
+    @Column(name = "security_key", nullable = false)
+    private String securityKey;
+
     @Column(name = "status", nullable = false)
     private String status;
 
