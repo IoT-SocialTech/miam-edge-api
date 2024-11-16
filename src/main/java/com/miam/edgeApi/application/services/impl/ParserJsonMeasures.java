@@ -14,26 +14,15 @@ public class ParserJsonMeasures {
         jsonObject = new JSONObject(json);
     }
 
-    public String getHeartRate(){ return jsonObject.getString("heartRate"); }
+    public Double getHeartRate(){ return jsonObject.getDouble("HeartRate"); }
 
-    public String getTemperature(){
-        return jsonObject.getString("temperature");
+    public Double getTemperature(){
+        return jsonObject.getDouble("Temperature");
     }
 
-    public String getAlertsGenerated(){
-        return jsonObject.getString("alertsGenerated");
-    }
+    public String getDistance() { return jsonObject.getString("Distance"); }
 
-    public String getDistanceDetector(){
-        return jsonObject.getString("distanceDetector");
-    }
+    public String getMacAddress() { return jsonObject.getString("MacAddress");}
 
-    public String getPatientId(){
-        return jsonObject.getString("patientId");
-    }
-
-    public String getDeviceId(){
-        return jsonObject.getString("deviceId");
-    }
 
 }

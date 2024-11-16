@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,30 +27,30 @@ public class MetricsController {
     }
 
     @Operation(summary = "Get average heart rate")
-    @GetMapping("/metrics/averageHeartRate")
-    public ResponseEntity<ApiResponse<AverageHeartRateResponseDto>> getAverageHeartRate() {
-        var res = metricsService.getAverageHeartRate();
+    @GetMapping("/metrics/averageHeartRate/{patientId}")
+    public ResponseEntity<ApiResponse<AverageHeartRateResponseDto>> getAverageHeartRate(@PathVariable int patientId) {
+        var res = metricsService.getAverageHeartRate(patientId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @Operation(summary = "Get average temperature")
-    @GetMapping("/metrics/averageTemperature")
-    public ResponseEntity<ApiResponse<AverageTemperatureResponseDto>> getAverageTemperature() {
-        var res = metricsService.getAverageTemperature();
+    @GetMapping("/metrics/averageTemperature/{patientId}")
+    public ResponseEntity<ApiResponse<AverageTemperatureResponseDto>> getAverageTemperature(@PathVariable int patientId) {
+        var res = metricsService.getAverageTemperature(patientId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @Operation(summary = "Get temperature")
-    @GetMapping("/metrics/temperature")
-    public ResponseEntity<ApiResponse<TemperatureResponseDto>> getTemperature() {
-        var res = metricsService.getTemperature();
+    @GetMapping("/metrics/temperature/{patientId}")
+    public ResponseEntity<ApiResponse<TemperatureResponseDto>> getTemperature(@PathVariable int patientId) {
+        var res = metricsService.getTemperature(patientId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 
     @Operation(summary = "Get heart rate")
-    @GetMapping("/metrics/heartRate")
-    public ResponseEntity<ApiResponse<HeartRateResponseDto>> getHeartRate() {
-        var res = metricsService.getHeartRate();
+    @GetMapping("/metrics/heartRate/{patientId}")
+    public ResponseEntity<ApiResponse<HeartRateResponseDto>> getHeartRate(@PathVariable int patientId) {
+        var res = metricsService.getHeartRate(patientId);
         return new ResponseEntity<>(res, HttpStatus.OK);
     }
 }

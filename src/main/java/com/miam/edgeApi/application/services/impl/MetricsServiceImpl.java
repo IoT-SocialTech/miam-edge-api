@@ -5,8 +5,10 @@ import com.miam.edgeApi.application.dto.response.AverageTemperatureResponseDto;
 import com.miam.edgeApi.application.dto.response.HeartRateResponseDto;
 import com.miam.edgeApi.application.dto.response.TemperatureResponseDto;
 import com.miam.edgeApi.application.services.MetricsService;
+import com.miam.edgeApi.domain.entities.Device;
 import com.miam.edgeApi.domain.entities.Metrics;
 import com.miam.edgeApi.enums.MetricsStatus;
+import com.miam.edgeApi.infraestructure.repositories.DeviceRepository;
 import com.miam.edgeApi.infraestructure.repositories.MetricsRepository;
 import com.miam.edgeApi.shared.model.dto.response.ApiResponse;
 import com.miam.edgeApi.shared.model.enums.Estatus;
@@ -15,6 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 
 @Service
@@ -23,43 +30,52 @@ public class MetricsServiceImpl implements MetricsService {
     @Autowired
     private MetricsRepository metricsRepository;
 
+    @Autowired
+    private DeviceRepository deviceRepository;
+
+    private final String url = "https://fir-embedded-miam-default-rtdb.firebaseio.com/.json";
+
     @Override
     @Transactional
     public void createMetrics(JSONObject jsonMetrics) {
         Metrics metrics = new Metrics();
 
-        int temperature;
-        int heartRate;
-        int alertsGenerated;
-        int patientId;
-        int deviceId;
-        boolean distanceDetector;
+        double temperature;
+        double heartRate;
+        double distance;
+        String deviceId;
 
         try {
+            deviceId = jsonMetrics.getString("MacAddress");
 
-            temperature = (int) Float.parseFloat(jsonMetrics.getString("temperature"));
-            heartRate = Integer.parseInt(jsonMetrics.getString("heartRate"));
-            alertsGenerated = Integer.parseInt(jsonMetrics.getString("alertsGenerated"));
-            patientId = Integer.parseInt(jsonMetrics.getString("patientId"));
-            deviceId = Integer.parseInt(jsonMetrics.getString("deviceId"));
-            distanceDetector = Boolean.parseBoolean(jsonMetrics.getString("distanceDetector"));
+            Device device = deviceRepository.getDeviceById(deviceId);
+
+            temperature = jsonMetrics.getDouble("Temperature");
+            heartRate = jsonMetrics.getDouble("HeartRate");
+            distance = jsonMetrics.getDouble("Distance");
 
             metrics.setHeartRate(heartRate);
             metrics.setTemperature(temperature);
-            metrics.setAlertsGenerated(alertsGenerated);
-            metrics.setDistanceDetector(distanceDetector);
+            metrics.setDistance(distance);
+            metrics.setPatientId(device.getPatientId());
             metrics.setDate(LocalDateTime.now());
-            metrics.setPatientId(patientId);
+            metrics.setDeviceId(deviceId);
             metrics.setDeviceId(deviceId);
             metrics.setStatus(MetricsStatus.NORMAL.getStatus());
 
+            if (distance < device.getLimitDistance()){
+                metrics.setDistanceDetector(true);
+            } else {
+                metrics.setDistanceDetector(false);
+            }
+
             if (temperature > 37 && temperature <= 39 || temperature >= 34 && temperature < 36 ) {
                 metrics.setStatus(MetricsStatus.WARNING.getStatus() + " - Temperature");
-            } else if (temperature > 39 || temperature < 34){
+            } else if (temperature > device.getLimitTemperature() || temperature < 34){
                 metrics.setStatus(MetricsStatus.DANGER.getStatus() + " - Temperature");
             } else if (heartRate < 60 && heartRate >= 40|| heartRate > 100 && heartRate <= 120){
                 metrics.setStatus(MetricsStatus.WARNING.getStatus() + " - Heart Rate");
-            } else if (heartRate < 40 || heartRate > 120){
+            } else if (heartRate < 40 || heartRate > device.getLimitHeartRate()){
                 metrics.setStatus(MetricsStatus.DANGER.getStatus() + " - Heart Rate");
             }
 
@@ -71,77 +87,123 @@ public class MetricsServiceImpl implements MetricsService {
     }
 
     @Override
-    public ApiResponse<HeartRateResponseDto> getHeartRate(){
+    public ApiResponse<HeartRateResponseDto> getHeartRate(int patientId) {
 
-        String metrics = "{\"heartRate\":\"120\", \"temperature\": \"36\", \"alertsGenerated\": \"0\", \"distanceDetector\":\"false\", \"patientId\": \"1\", \"deviceId\":\"1\"}";
-        ParserJsonMeasures parserJsonMeasures = new ParserJsonMeasures(metrics);
-
-        int heartRate;
+        double heartRate;
         HeartRateResponseDto heartRateResponseDto = null;
 
         try {
-            heartRateResponseDto = new HeartRateResponseDto();
-            heartRate = Integer.parseInt(parserJsonMeasures.getHeartRate());
+            HttpClient client = HttpClient.newHttpClient();
 
-            heartRateResponseDto.setHeartRate(heartRate);
-            heartRateResponseDto.setDate(LocalDateTime.now());
-            heartRateResponseDto.setStatus(MetricsStatus.NORMAL.getStatus());
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
 
-            if (heartRate < 60 && heartRate >= 40|| heartRate > 100 && heartRate <= 120){
-                heartRateResponseDto.setStatus(MetricsStatus.WARNING.getStatus());
-            } else if (heartRate < 40 || heartRate > 120){
-                heartRateResponseDto.setStatus(MetricsStatus.DANGER.getStatus());
+            HttpResponse<String> metrics = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            ParserJsonMeasures parserJsonMeasures = new ParserJsonMeasures(metrics.body());
+
+            if (deviceRepository.existsById(parserJsonMeasures.getMacAddress())){
+                Device device = deviceRepository.findById(parserJsonMeasures.getMacAddress()).get();
+                if (patientId == device.getPatientId()){
+                    try {
+                        heartRateResponseDto = new HeartRateResponseDto();
+                        heartRate = parserJsonMeasures.getHeartRate();
+
+                        heartRateResponseDto.setHeartRate(heartRate);
+                        heartRateResponseDto.setDate(LocalDateTime.now());
+                        heartRateResponseDto.setStatus(MetricsStatus.NORMAL.getStatus());
+
+                        if (heartRate < 60 && heartRate >= 40|| heartRate > 100 && heartRate <= device.getLimitHeartRate()){
+                            heartRateResponseDto.setStatus(MetricsStatus.WARNING.getStatus());
+                        } else if (heartRate < 40 || heartRate > device.getLimitHeartRate()){
+                            heartRateResponseDto.setStatus(MetricsStatus.DANGER.getStatus());
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+
+                    if (heartRateResponseDto != null) {
+                        return new ApiResponse<> ("Heart Rate fetched successfully", Estatus.SUCCESS, heartRateResponseDto);
+                    } else {
+                        return new ApiResponse<> ("Error fetching Heart Rate", Estatus.ERROR, null);
+                    }
+                } else {
+                    return new ApiResponse<> ("Patient not found", Estatus.ERROR, null);
+                }
+
+            } else {
+                return new ApiResponse<> ("Device not found", Estatus.ERROR, null);
             }
 
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-
-        if (heartRateResponseDto != null) {
-            return new ApiResponse<> ("Heart Rate fetched successfully", Estatus.SUCCESS, heartRateResponseDto);
-        } else {
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
             return new ApiResponse<> ("Error fetching Heart Rate", Estatus.ERROR, null);
         }
     }
 
     @Override
-    public ApiResponse<TemperatureResponseDto> getTemperature(){
+    public ApiResponse<TemperatureResponseDto> getTemperature(int patientId){
 
-        String metrics = "{\"heartRate\":\"80\", \"temperature\": \"32.80\", \"alertsGenerated\": \"0\", \"distanceDetector\":\"false\", \"patientId\": \"1\", \"deviceId\":\"1\"}";
-        ParserJsonMeasures parserJsonMeasures = new ParserJsonMeasures(metrics);
-
-        float temperature;
+        double temperature;
         TemperatureResponseDto temperatureResponseDto = null;
 
         try {
-            temperatureResponseDto = new TemperatureResponseDto();
-            temperature = Float.parseFloat(parserJsonMeasures.getTemperature());
+            HttpClient client = HttpClient.newHttpClient();
 
-            temperatureResponseDto.setTemperature(temperature);
-            temperatureResponseDto.setDate(LocalDateTime.now());
-            temperatureResponseDto.setStatus(MetricsStatus.NORMAL.getStatus());
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
 
-            if (temperature > 37 && temperature <= 39 || temperature >= 34 && temperature < 36 ) {
-                temperatureResponseDto.setStatus(MetricsStatus.WARNING.getStatus());
-            } else if (temperature > 39 || temperature < 34){
-                temperatureResponseDto.setStatus(MetricsStatus.DANGER.getStatus());
+            HttpResponse<String> metrics = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            ParserJsonMeasures parserJsonMeasures = new ParserJsonMeasures(metrics.body());
+
+            if (deviceRepository.existsById(parserJsonMeasures.getMacAddress())) {
+                Device device = deviceRepository.findById(parserJsonMeasures.getMacAddress()).get();
+                if (patientId == device.getPatientId()) {
+                    try {
+                        temperatureResponseDto = new TemperatureResponseDto();
+                        temperature = parserJsonMeasures.getTemperature();
+
+                        temperatureResponseDto.setTemperature(temperature);
+                        temperatureResponseDto.setDate(LocalDateTime.now());
+                        temperatureResponseDto.setStatus(MetricsStatus.NORMAL.getStatus());
+
+                        if (temperature > 37 && temperature <= device.getLimitTemperature() || temperature >= 34 && temperature < 36 ) {
+                            temperatureResponseDto.setStatus(MetricsStatus.WARNING.getStatus());
+                        } else if (device.getLimitTemperature() > 39 || temperature < 34){
+                            temperatureResponseDto.setStatus(MetricsStatus.DANGER.getStatus());
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println("Error: " + e.getMessage());
+                    }
+
+                    if (temperatureResponseDto != null) {
+                        return new ApiResponse<> ("Temperature fetched successfully", Estatus.SUCCESS, temperatureResponseDto);
+                    } else {
+                        return new ApiResponse<> ("Error fetching Temperature", Estatus.ERROR, null);
+                    }
+                } else {
+                    return new ApiResponse<> ("Patient not found", Estatus.ERROR, null);
+                }
+            } else {
+                return new ApiResponse<> ("Device not found", Estatus.ERROR, null);
             }
-
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-
-        if (temperatureResponseDto != null) {
-            return new ApiResponse<> ("Temperature fetched successfully", Estatus.SUCCESS, temperatureResponseDto);
-        } else {
-            return new ApiResponse<> ("Error fetching Temperature", Estatus.ERROR, null);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return new ApiResponse<> ("Error fetching Heart Rate", Estatus.ERROR, null);
         }
     }
 
     @Override
-    public ApiResponse<AverageHeartRateResponseDto> getAverageHeartRate(){
+    public ApiResponse<AverageHeartRateResponseDto> getAverageHeartRate(int patientId){
 
-        double averageHeartRate = metricsRepository.findAverageHeartRate();
+        double averageHeartRate = metricsRepository.findAverageHeartRate(patientId);
         AverageHeartRateResponseDto averageHeartRateResponseDto = new AverageHeartRateResponseDto();
 
         averageHeartRateResponseDto.setAverageHeartRate(averageHeartRate);
@@ -154,16 +216,16 @@ public class MetricsServiceImpl implements MetricsService {
             averageHeartRateResponseDto.setStatus(MetricsStatus.DANGER.getStatus());
         }
 
-        System.out.println("Average Heart Rate: " + metricsRepository.findAverageHeartRate());
+        System.out.println("Average Heart Rate: " + metricsRepository.findAverageHeartRate(patientId));
 
         return new ApiResponse<> ("Average Heart Rate fetched successfully", Estatus.SUCCESS, averageHeartRateResponseDto);
 
     }
 
     @Override
-    public ApiResponse<AverageTemperatureResponseDto> getAverageTemperature(){
+    public ApiResponse<AverageTemperatureResponseDto> getAverageTemperature(int patientId){
 
-        double averageTemperature = metricsRepository.findAverageTemperature();
+        double averageTemperature = metricsRepository.findAverageTemperature(patientId);
         AverageTemperatureResponseDto averageTemperatureResponseDto = new AverageTemperatureResponseDto();
 
         averageTemperatureResponseDto.setAverageTemperature(averageTemperature);
@@ -176,7 +238,7 @@ public class MetricsServiceImpl implements MetricsService {
             averageTemperatureResponseDto.setStatus(MetricsStatus.DANGER.getStatus());
         }
 
-        System.out.println("Average Temperature: " + metricsRepository.findAverageTemperature());
+        System.out.println("Average Temperature: " + metricsRepository.findAverageTemperature(patientId));
 
         return new ApiResponse<> ("Average Temperature fetched successfully", Estatus.SUCCESS, averageTemperatureResponseDto);
     }

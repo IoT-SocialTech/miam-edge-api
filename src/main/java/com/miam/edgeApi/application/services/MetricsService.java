@@ -11,12 +11,12 @@ public interface MetricsService {
 
     void createMetrics(JSONObject jsonMetrics);
 
-    ApiResponse<AverageHeartRateResponseDto> getAverageHeartRate();
+    ApiResponse<AverageHeartRateResponseDto> getAverageHeartRate(int id);
 
-    ApiResponse<AverageTemperatureResponseDto> getAverageTemperature();
+    ApiResponse<AverageTemperatureResponseDto> getAverageTemperature(int id);
 
-    ApiResponse<HeartRateResponseDto> getHeartRate();
+    ApiResponse<HeartRateResponseDto> getHeartRate(int id);
 
-    ApiResponse<TemperatureResponseDto> getTemperature();
+    ApiResponse<TemperatureResponseDto> getTemperature(int id);
 
 }

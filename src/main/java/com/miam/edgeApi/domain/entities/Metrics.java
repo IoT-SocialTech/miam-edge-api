@@ -21,16 +21,16 @@ public class Metrics {
     private int id;
 
     @Column(name = "heart_rate")
-    private int heartRate;
+    private double heartRate;
 
     @Column(name = "temperature")
-    private int temperature;
+    private double temperature;
 
-    @Column(name = "alerts_generated")
-    private int alertsGenerated;
+    @Column(name = "distance")
+    private double distance;
 
     @Column(name = "distance_detector")
-    private boolean distanceDetector;
+    private Boolean distanceDetector;
 
     @Column(name = "status")
     private String status;
@@ -42,6 +42,6 @@ public class Metrics {
     private int patientId;
 
     @Column(name = "device_id")
-    private int deviceId;
+    private String deviceId;
 
 }

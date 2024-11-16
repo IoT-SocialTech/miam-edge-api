@@ -5,18 +5,24 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class HeartRateResponseDto {
+public class DeviceResponseDto {
 
-    private double heartRate;
+    private String id;
 
-    private LocalDateTime date;
+    private String model;
+
+    private int limitHeartRate;
+
+    private int limitTemperature;
+
+    private int limitDistance;
 
     private String status;
+
+    private int patientId;
 
 }
