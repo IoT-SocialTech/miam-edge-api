@@ -36,3 +36,6 @@ server:
 app:
   jwt-secret: ${JWT_KEY}
   jwt-expiration-min: 43200
+  onesignal-app-id: ${ONESIGNAL_APP_ID}
+  onesignal-api-key: ${ONESIGNAL_API_KEY}
+  onesignal-api-url: ${ONESIGNAL_API_URL}

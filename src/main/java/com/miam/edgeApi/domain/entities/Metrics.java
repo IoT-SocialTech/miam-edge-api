@@ -26,6 +26,9 @@ public class Metrics {
     @Column(name = "temperature")
     private double temperature;
 
+    @Column(name = "panic_button")
+    private Boolean panicButton;
+
     @Column(name = "distance")
     private double distance;
 

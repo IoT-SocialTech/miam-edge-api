@@ -1,9 +1,7 @@
 package com.miam.edgeApi.application.services.impl;
 
-import com.miam.edgeApi.application.dto.response.AverageHeartRateResponseDto;
-import com.miam.edgeApi.application.dto.response.AverageTemperatureResponseDto;
-import com.miam.edgeApi.application.dto.response.HeartRateResponseDto;
-import com.miam.edgeApi.application.dto.response.TemperatureResponseDto;
+import com.miam.edgeApi.application.dto.request.CreateMetricsDto;
+import com.miam.edgeApi.application.dto.response.*;
 import com.miam.edgeApi.application.services.MetricsService;
 import com.miam.edgeApi.domain.entities.Device;
 import com.miam.edgeApi.domain.entities.Metrics;
@@ -12,10 +10,19 @@ import com.miam.edgeApi.infraestructure.repositories.DeviceRepository;
 import com.miam.edgeApi.infraestructure.repositories.MetricsRepository;
 import com.miam.edgeApi.shared.model.dto.response.ApiResponse;
 import com.miam.edgeApi.shared.model.enums.Estatus;
+import org.apache.hc.core5.http.ContentType;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+
 
 import java.io.IOException;
 import java.net.URI;
@@ -27,6 +34,16 @@ import java.time.LocalDateTime;
 @Service
 public class MetricsServiceImpl implements MetricsService {
 
+    @Value("${app.onesignal-app-id}")
+    private String onesignalAppId;
+
+    @Value("${app.onesignal-api-key}")
+    private String onesignalApiKey;
+
+    @Value("${app.onesignal-api-url}")
+    private String onesignalApiUrl;
+
+
     @Autowired
     private MetricsRepository metricsRepository;
 
@@ -37,13 +54,18 @@ public class MetricsServiceImpl implements MetricsService {
 
     @Override
     @Transactional
-    public void createMetrics(JSONObject jsonMetrics) {
+    public ApiResponse<CreateMetricsResponseDto> createMetrics(CreateMetricsDto createMetricsDto) {
+
+            JSONObject jsonMetrics = new JSONObject(createMetricsDto.getData());
+
         Metrics metrics = new Metrics();
 
         double temperature;
         double heartRate;
         double distance;
+        boolean panicButtom;
         String deviceId;
+        String panicAlertTitle;
 
         try {
             deviceId = jsonMetrics.getString("MacAddress");
@@ -53,11 +75,14 @@ public class MetricsServiceImpl implements MetricsService {
             temperature = jsonMetrics.getDouble("Temperature");
             heartRate = jsonMetrics.getDouble("HeartRate");
             distance = jsonMetrics.getDouble("Distance");
+            panicButtom = jsonMetrics.getBoolean("PanicButton");
+            panicAlertTitle = jsonMetrics.getString("Alert");
 
             metrics.setHeartRate(heartRate);
             metrics.setTemperature(temperature);
             metrics.setDistance(distance);
             metrics.setPatientId(device.getPatientId());
+            metrics.setPanicButton(panicButtom);
             metrics.setDate(LocalDateTime.now());
             metrics.setDeviceId(deviceId);
             metrics.setDeviceId(deviceId);
@@ -79,9 +104,43 @@ public class MetricsServiceImpl implements MetricsService {
                 metrics.setStatus(MetricsStatus.DANGER.getStatus() + " - Heart Rate");
             }
 
+            if (panicButtom){
+                try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+                    HttpPost httpPost = new HttpPost(onesignalApiUrl);
+
+                    httpPost.setHeader("Content-Type", "application/json; charset=UTF-8");
+                    httpPost.setHeader("Authorization", "Basic " + onesignalApiKey);
+
+                    JSONObject body = new JSONObject();
+
+                    body.put("app_id", onesignalAppId);
+                    body.put("included_segments", new String[]{"All"});
+                    body.put("headings", new JSONObject().put("en", panicAlertTitle));
+                    body.put("contents", new JSONObject().put("en", "La alerta de panico ha sido activada")); // Mensaje de la notificación
+
+                    StringEntity entity = new StringEntity(body.toString(), ContentType.parse("UTF-8"));
+                    httpPost.setEntity(entity);
+
+                    try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+                        System.out.println("Response Code: " + response.getCode());
+                        System.out.println("Response: " + EntityUtils.toString(response.getEntity()));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+
             metricsRepository.save(metrics);
+
+            CreateMetricsResponseDto createMetricsResponseDto = CreateMetricsResponseDto.builder()
+                    .data(createMetricsDto.getData())
+                    .build();
+
+            return new ApiResponse<> ("Metrics created successfully", Estatus.SUCCESS, createMetricsResponseDto );
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
+            return new ApiResponse<> ("Error creating Metrics", Estatus.ERROR, null);
         }
 
     }

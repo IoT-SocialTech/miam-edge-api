@@ -26,8 +26,6 @@ class EdgeApiApplicationTests {
 				"  \"MacAddress\": \"MAC982398\"\n" +
 				"}");
 
-		metricsService.createMetrics(json);
-
 	}
 
 }

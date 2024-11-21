@@ -30,6 +30,13 @@ public class DeviceController {
         return new ResponseEntity<>(res, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Get device by id")
+    @GetMapping("/device/{id}")
+    public ResponseEntity<ApiResponse<DeviceResponseDto>> getDeviceById(@PathVariable String id) {
+        var res = deviceService.getDeviceById(id);
+        return new ResponseEntity<>(res, HttpStatus.OK);
+    }
+
     @Operation(summary = "Update device")
     @PostMapping("/device/{id}")
     public ResponseEntity<ApiResponse<DeviceResponseDto>> updateDevice(@PathVariable String id, @RequestBody UpdateLimitValues updateLimitValues) {

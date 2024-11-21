@@ -37,6 +37,17 @@ public class DeviceServiceImpl implements DeviceService{
     }
 
     @Override
+    public ApiResponse<DeviceResponseDto> getDeviceById(String id) {
+        Device device = deviceRepository.getDeviceById(id);
+        if (device == null) {
+            return new ApiResponse<>("Device not found", Estatus.ERROR, null);
+        } else {
+            DeviceResponseDto deviceResponseDto = modelMapper.map(device, DeviceResponseDto.class);
+            return new ApiResponse<>("Device found", Estatus.SUCCESS, deviceResponseDto);
+        }
+    }
+
+    @Override
     public ApiResponse<DeviceResponseDto> updateLimitsValues(String id, UpdateLimitValues updateLimitValues) {
         Device device = deviceRepository.getDeviceById(id);
         if (device == null) {

@@ -33,20 +33,22 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
+            // Obtén el token del encabezado de la solicitud
             var token = Utilities.getJwtTokenFromRequest(request);
 
-            //valida el token
             if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-                //se obtiene el username del token
+                // Extrae el username (sub) desde el token
                 var username = jwtTokenProvider.getUsernameFromToken(token);
-                //carga los detalles del usuario autenticado para establecer la seguridad
-                UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
 
-                //crea un objeto que representa la autenticación del usuario
+                // Crea un UserDetails básico si el token es válido, sin cargar desde la base de datos
+                var userDetails = org.springframework.security.core.userdetails.User.builder()
+                        .username(username)
+                        .password("") // No se necesita la contraseña aquí
+                        .build();
+
+                // Establece la autenticación en el SecurityContext
                 var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                //establece los detalles de autenticación adicionales
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                //establece la seguridad
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {

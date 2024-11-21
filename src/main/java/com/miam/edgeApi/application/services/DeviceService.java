@@ -11,4 +11,6 @@ public interface DeviceService {
 
     ApiResponse<DeviceResponseDto> updateLimitsValues(String id, UpdateLimitValues updateLimitValues);
 
+    ApiResponse<DeviceResponseDto> getDeviceById(String id);
+
 }
